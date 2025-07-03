@@ -10,27 +10,22 @@ import (
 )
 
 func main() {
-	// Connect to database
 	db := database.ConnectDB()
 	if db == nil {
 		log.Fatal("Failed to connect to database")
 	}
 
-	// Auto-migrate the schema
 	err := db.AutoMigrate(&model.Member{})
 	if err != nil {
 		log.Fatal("Failed to migrate database:", err)
 	}
 
-	// Seed the database with static data
 	database.SeedMembers(db)
 
 	router := gin.Default()
 
-	// Serve static files (images)
 	router.Static("/assets", "./assets")
 
-	// Enable CORS for frontend
 	router.Use(func(c *gin.Context) {
 		c.Header("Access-Control-Allow-Origin", "*")
 		c.Header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
@@ -44,14 +39,12 @@ func main() {
 		c.Next()
 	})
 
-	// Health check endpoint
 	router.GET("/ping", func(c *gin.Context) {
 		c.JSON(200, gin.H{
 			"message": "pong",
 		})
 	})
 
-	// Get all members
 	router.GET("/api/members", func(c *gin.Context) {
 		var members []model.Member
 		result := db.Find(&members)
@@ -68,7 +61,6 @@ func main() {
 		})
 	})
 
-	// Get member by ID
 	router.GET("/api/members/:id", func(c *gin.Context) {
 		id := c.Param("id")
 		var member model.Member

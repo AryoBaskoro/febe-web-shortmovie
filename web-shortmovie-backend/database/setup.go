@@ -3,21 +3,21 @@ package database
 import (
 	"fmt"
 	"log"
+	"os"
+	"strconv"
 
+	"github.com/AryoBaskoro/web-shortmovie/model"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-	"github.com/AryoBaskoro/web-shortmovie/model"
-)
-
-const (
-	host     = "localhost"
-	port     = 5432
-	user     = "postgres"
-	password = "Aryo1967#"
-	dbname   = "mulmed_shortmovie_db"
 )
 
 func ConnectDB() *gorm.DB {
+	host := os.Getenv("DB_HOST")
+	port,_ := strconv.Atoi(os.Getenv("DB_PORT"))
+	user := os.Getenv("DB_USER")
+	password := os.Getenv("DB_PASS")
+	dbname := os.Getenv("DB_NAME")
+
 	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
 		host, port, user, password, dbname)
 	
@@ -32,7 +32,6 @@ func ConnectDB() *gorm.DB {
 }
 
 func SeedMembers(db *gorm.DB) {
-	// Check if members already exist
 	var count int64
 	db.Model(&model.Member{}).Count(&count)
 	
@@ -41,7 +40,6 @@ func SeedMembers(db *gorm.DB) {
 		return
 	}
 
-	// Static member data
 	members := []model.Member{
 		{
 			FullName:         "Dheovan Winata Alvian",
@@ -111,7 +109,6 @@ func SeedMembers(db *gorm.DB) {
 		},
 	}
 
-	// Insert members
 	result := db.Create(&members)
 	if result.Error != nil {
 		log.Printf("Error seeding members: %v", result.Error)
